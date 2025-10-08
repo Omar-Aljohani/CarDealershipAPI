@@ -4,9 +4,6 @@ using CarDealershipAPI.Models;
 using CarDealershipAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace CarDealershipAPI.Controllers
 {
@@ -28,15 +25,14 @@ namespace CarDealershipAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest req)
         {
-            // create user as inactive until OTP validated. For demo we create and ask OTP
-            if (await _db.Users.AnyAsync(u => u.Email == req.Email))
+            if (await _db.Users.AnyAsync(u => u.Email == req.Email.ToLower()))
                 return Conflict(new { message = "Email already in use" });
 
             var user = new User
             {
                 Id = Guid.NewGuid(),
                 Name = req.Name,
-                Email = req.Email,
+                Email = req.Email.ToLower(),
                 Role = req.Role?.ToLower() == "admin" ? Role.Admin : Role.Customer,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password)
             };
@@ -45,47 +41,49 @@ namespace CarDealershipAPI.Controllers
             await _db.SaveChangesAsync();
 
             // Generate OTP for registration
-            await _otp.GenerateAndSendOtpAsync(user.Id, user.Email, "Register");
+            // You don't need to enter this OTP anywhere, it is for demonstration. 
+            await _otp.GenerateAndSendOtpAsync(user.Id, user.Email.ToLower(), OTPAction.Register);
             return Ok(new { message = "User created. Verify OTP sent(simulated)." });
         }
 
         [HttpPost("request-otp")]
         public async Task<IActionResult> RequestOtp([FromBody] RequestOtpDto dto)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            await _otp.GenerateAndSendOtpAsync(user?.Id, dto.Email, dto.Action);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email.ToLower());
+            await _otp.GenerateAndSendOtpAsync(user?.Id, dto.Email.ToLower(), dto.Action);
             return Ok(new { message = "OTP generated (simulated delivery)." });
         }
 
         [HttpPost("validate-otp")]
         public async Task<IActionResult> ValidateOtp([FromBody] ValidateOtpDto dto)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            var (success, otpToken) = await _otp.ValidateOtpAsync(dto.Email, dto.Action, dto.Otp);
+
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email.ToLower());
+            var (success, otpToken) = await _otp.ValidateOtpAsync(dto.Email.ToLower(), dto.Action, dto.Otp);
             if (!success) return BadRequest(new { message = "Invalid or expired OTP" });
 
             // If action is Login/Register -> return JWT only when appropriate
-            if (dto.Action == "Login")
+            if (dto.Action == OTPAction.Login)
             {
                 if (user == null) return BadRequest(new { message = "User not found" });
                 var token = _jwt.GenerateToken(user);
                 return Ok(new AuthResponse(token, user.Role.ToString()));
             }
 
-            // For actions requiring OTP token, return otpToken to be used in X-OTPToken header.
+            // For actions requiring OTP token, return otpToken to be used in X-OTP-Token header.
             return Ok(new { otpToken });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest req)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email.ToLower());
             if (user == null) return Unauthorized(new {message = "Invalid credentials" });
 
             if (!BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash)) return Unauthorized(new { message = "Invalid credentials" });
 
             // Instead of issuing JWT immediately, require OTP for sensitive login
-            await _otp.GenerateAndSendOtpAsync(user.Id, user.Email, "Login");
+            await _otp.GenerateAndSendOtpAsync(user.Id, user.Email.ToLower(), OTPAction.Login);
             return Ok(new { message = "OTP sent to proceed with login (simulated)." });
         }
     }

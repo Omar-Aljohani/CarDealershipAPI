@@ -1,7 +1,6 @@
 ﻿using CarDealershipAPI.Data;
 using CarDealershipAPI.Models;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.WebRequestMethods;
 
 namespace CarDealershipAPI.Services;
 
@@ -15,7 +14,7 @@ public class OtpService
         _logger = logger;
     }
 
-    public async Task GenerateAndSendOtpAsync(Guid? userId, string email, string action)
+    public async Task GenerateAndSendOtpAsync(Guid? userId, string email, OTPAction action)
     {
         // generate 6-digit OTP
         var rng = Random.Shared;
@@ -39,7 +38,7 @@ public class OtpService
 
     }
 
-    public async Task<(bool success, string? otpToken)> ValidateOtpAsync(string email, string action, string otp)
+    public async Task<(bool success, string? otpToken)> ValidateOtpAsync(string email, OTPAction action, string otp)
     {
         // find most recent non-used entry for action
         var entry = await _db.OtpEntries
@@ -57,7 +56,7 @@ public class OtpService
 
         return (true, entry.OtpToken);
     }
-    public async Task<bool> ValidateOtpTokenForActionAsync(Guid userId, string action, string? token)
+    public async Task<bool> ValidateOtpTokenForActionAsync(Guid userId, OTPAction action, string? token)
     {
         if (string.IsNullOrWhiteSpace(token)) return false;
 

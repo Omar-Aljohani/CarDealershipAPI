@@ -26,22 +26,21 @@ namespace CarDealershipAPI.Controllers
         [HttpPost("request-purchase")]
         public async Task<IActionResult> PurchaseRequest([FromBody] PurchaseRequestDto dto)
         {
-            // Customer must request OTP and validate; purchase action requires OTP token in header
             var currentUserId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
             var otpToken = Request.Headers["X-OTP-Token"].FirstOrDefault();
             var ok = await _otp.ValidateOtpTokenForActionAsync(currentUserId,
-            "PurchaseRequest", otpToken);
+            OTPAction.PurchaseRequest, otpToken);
             if (!ok) return Forbid();
 
             var v = await _db.Vehicles.FindAsync(dto.VehicleId);
             if (v == null || !v.Available) return BadRequest(new {message ="Vehicle unavailable"});
 
-            // Create sale record (for demo we just create and mark vehicle unavailable)
+
             var sale = new Sale
             {
                 Id = Guid.NewGuid(),
                 VehicleId = v.Id,
-                BuyerId = currentUserId,
+                UserId = currentUserId,
                 Price = v.Price,
                 PurchasedAt = DateTime.UtcNow
             };
@@ -66,7 +65,7 @@ namespace CarDealershipAPI.Controllers
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicle.Id,
-                BuyerId = customer.Id,
+                UserId = customer.Id,
                 Price = dto.Price,
                 PurchasedAt = DateTime.UtcNow
             };
@@ -87,12 +86,12 @@ namespace CarDealershipAPI.Controllers
             var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)!.Value;
             if (role == "Admin")
             {
-                var all = await _db.Sales.Include(s => s.Vehicle).Include(s => s.Buyer).ToListAsync();
+                var all = await _db.Sales.Include(s => s.Vehicle).Include(s => s.User).ToListAsync();
                 return Ok(all);
             }
             else
             {
-                var usersSales = await _db.Sales.Where(s => s.BuyerId == userId).Include(s => s.Vehicle).ToListAsync();
+                var usersSales = await _db.Sales.Where(s => s.UserId == userId).Include(s => s.Vehicle).ToListAsync();
                 return Ok(usersSales);
             }
         }

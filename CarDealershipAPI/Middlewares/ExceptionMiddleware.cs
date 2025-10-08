@@ -23,7 +23,7 @@ public class ExceptionMiddleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode =
             (int)HttpStatusCode.InternalServerError;
-            var resp = JsonSerializer.Serialize(new { error = ex.Message });
+            var resp = JsonSerializer.Serialize(new { error = "A server error had occured" });
             await context.Response.WriteAsync(resp);
         }
     }

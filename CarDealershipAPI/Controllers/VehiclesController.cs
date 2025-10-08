@@ -5,7 +5,6 @@ using CarDealershipAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace CarDealershipAPI.Controllers
 {
@@ -24,6 +23,7 @@ namespace CarDealershipAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Customer")] 
         public async Task<IActionResult> Browse([FromQuery] string? make, [FromQuery] string? model,
             [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
         {
@@ -38,6 +38,7 @@ namespace CarDealershipAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Customer")] 
         public async Task<IActionResult> Details(Guid id)
         {
             var v = await _svc.GetByIdAsync(id);
@@ -72,7 +73,7 @@ namespace CarDealershipAPI.Controllers
             // OTP protection required: client must send X-OTP-Token header after validating OTP
             var currentUserId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
             var otpToken = Request.Headers["X-OTP-Token"].FirstOrDefault();
-            var ok = await _otp.ValidateOtpTokenForActionAsync(currentUserId, "UpdateVehicle", otpToken);
+            var ok = await _otp.ValidateOtpTokenForActionAsync(currentUserId, OTPAction.UpdateVehicle, otpToken);
             if (!ok) return Forbid();
 
             var v = await _svc.GetByIdAsync(id);

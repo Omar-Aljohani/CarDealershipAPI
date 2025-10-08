@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-// Configuration (appsettings.json)
+// Configuration (appsettings.json) you must set a JWT key there.
 var configuration = builder.Configuration;
 
-// DbContext - InMemory for demo
+// DbContext
 builder.Services.AddDbContext<AppDbContext>(opts =>
 opts.UseInMemoryDatabase("CarDealershipDb"));
 
@@ -25,7 +26,11 @@ builder.Services.AddScoped<OtpService>();
 builder.Services.AddScoped<VehicleService>();
 
 // Authentication - JWT
-var jwtKey = configuration["Jwt:Key"] ?? "CfAT7YtEhH5u+C+q+qRjciDPyph98Ar0Ia7pwKkI5hU=";
+if(configuration["Jwt:Key"] == null || configuration["Jwt:Key"] == String.Empty)
+{
+    throw new Exception("You must provide a valid JWT key in configuration");
+}
+var jwtKey = configuration["Jwt:Key"];
 var jwtIssuer = configuration["Jwt:Issuer"] ?? "CarDealershipAPI";
 
 builder.Services.AddAuthentication(options =>
@@ -51,7 +56,10 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+}); ;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
