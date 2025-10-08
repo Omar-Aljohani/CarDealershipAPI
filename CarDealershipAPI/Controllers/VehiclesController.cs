@@ -23,7 +23,6 @@ namespace CarDealershipAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Customer")] 
         public async Task<IActionResult> Browse([FromQuery] string? make, [FromQuery] string? model,
             [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
         {
