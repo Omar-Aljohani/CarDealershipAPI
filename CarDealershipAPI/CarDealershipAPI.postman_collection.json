@@ -1,0 +1,760 @@
+{
+	"info": {
+		"_postman_id": "000f9456-0f0c-4811-9ea7-8bb5be50980b",
+		"name": "CarDealershipAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34833096"
+	},
+	"item": [
+		{
+			"name": "Step 0",
+			"item": [
+				{
+					"name": "Register Customer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Omar Aljohani\",\r\n  \"email\": \"omarnaljohani@gmail.com\",\r\n  \"password\": \"12345678Aa\",\r\n  \"role\": \"Customer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/Auth/register",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"Auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Admin Aljohani\",\n  \"email\": \"admin@test.com\",\n  \"password\": \"12345678Aa\",\n  \"role\": \"Admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/Auth/register",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"Auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "First you will need to create an admin and a customer account, There is a seeded account for admin as requested. You can either use it or use the provided testing account. This Postman testing file will support the created Admin account to better demonstrated the life-cycle of an account."
+		},
+		{
+			"name": "Customer Flow",
+			"item": [
+				{
+					"name": "Step 1",
+					"item": [
+						{
+							"name": "Customer Login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"omarnaljohani@gmail.com\",\r\n  \"password\": \"12345678Aa\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Auth/login",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate-otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"omarnaljohani@gmail.com\",\r\n  \"action\": \"Login\",\r\n  \"otp\": \"YOU_MUST_ENTER_THE_OTP\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Auth/validate-otp",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Auth",
+										"validate-otp"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "In the first step you will login as a customer to check the customer use cases.\n\n#Customer Login\n\nYou don't need to change anydata  \n#validate-otp\n\nYou must change the OTP value as it will not be valid for your loggin attempt. OTP is randomized and there is no way to guess the next value."
+				},
+				{
+					"name": "Step 2",
+					"item": [
+						{
+							"name": "Browse Vechicles",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Vehicles",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Vehicles"
+									],
+									"query": [
+										{
+											"key": "make",
+											"value": "Toyota",
+											"description": "The manufactorer of the car, can be null for any",
+											"disabled": true
+										},
+										{
+											"key": "model",
+											"value": "Model 3",
+											"description": "The model of the car, can be null for any",
+											"disabled": true
+										},
+										{
+											"key": "minPrice",
+											"value": "20000",
+											"description": "The minimum price for the car -Inclusive-, can be 0 or null for any",
+											"disabled": true
+										},
+										{
+											"key": "maxPrice",
+											"value": "30000",
+											"description": "the maximum price of the car -Inclusive-, can be null for any",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "View Vehicle Details",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/api/Vehicles/PASTE_CARID",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Vehicles",
+										"PASTE_CARID"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "You will need to copy the token generated in step 1, then select the Customer flow folder and press on authorization and select the bearer token. Paste the token and all the folder will inherit it from there.\n\nThen you can Browse Vehicles to see the pre-seeded cars, 10 in total as requested. You need to copy the id of any Vechicle for the next request which is View Vehicle Details and paste it as a parameter.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Step 3",
+					"item": [
+						{
+							"name": "request purchase otp",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"omarnaljohani@gmail.com\",\r\n  \"action\": \"PurchaseRequest\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Auth/request-otp",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Auth",
+										"request-otp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate  purchase request otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"omarnaljohani@gmail.com\",\r\n  \"action\": \"PurchaseRequest\",\r\n  \"otp\": \"YOU_MUST_ENTER_THE_OTP\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Auth/validate-otp",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Auth",
+										"validate-otp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Purchase Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-OTP-Token",
+										"value": "YOU_NEED_THE_GENERATED_TOKEN_FROM_THE_ABOVE_REQUEST",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"vehicleId\": \"YOU_MUST_ENTER_A_VAILD_ID\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Sales/request-purchase",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Sales",
+										"request-purchase"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "In this step you will generate an OTP, validate the OTP to get the token and add it to the purchase request to place it.  \n  \nYou will need to paste the OTP from the validate into purchase request and you will need to get any car from the browse step above and paste it in the body.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "This is the shared folder for all customer flow, you need to add the token once here and all customer folder will inherit it from here.",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImQ0NzQ1OGVkLTk1OGYtNGFmMy04MmEyLTRlZTYxYTk3ZWM0MyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6Im9tYXJuYWxqb2hhbmlAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Ik9tYXIgQWxqb2hhbmkiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJDdXN0b21lciIsImV4cCI6MTc1OTk1Mzg0MiwiaXNzIjoiQ2FyRGVhbGVyc2hpcEFQSSJ9.ql68Qvb8Sw-bB1jtr7FlKnVzCQ0kbh5CQ7cLjft_eKE",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Flow",
+			"item": [
+				{
+					"name": "Step 1",
+					"item": [
+						{
+							"name": "Admin Login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"admin@test.com\",\r\n  \"password\": \"12345678Aa\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Auth/login",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate-otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"admin@test.com\",\r\n  \"action\": \"Login\",\r\n  \"otp\": \"YOU_MUST_ENTER_THE_OTP\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Auth/validate-otp",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Auth",
+										"validate-otp"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "In the first step we will login using the admin information, you need to complete STEP 0 first.  \nThen login using the first request using the same information, After data you need to validate you got the OTP using the following request. You need to enter the generated OTP there."
+				},
+				{
+					"name": "Step 2",
+					"item": [
+						{
+							"name": "Add Vehicle",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-OTP-Token",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"make\": \"Toyota\",\r\n  \"model\": \"Camry\",\r\n  \"year\": 2025,\r\n  \"price\": 22000,\r\n  \"color\": \"Blue\",\r\n  \"mileage\": 2000,\r\n  \"description\": \"A reliable and fuel-efficient sedan in great condition. Recently serviced with all maintenance records available. Features include Bluetooth connectivity, backup camera, and smooth ride.\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Vehicles",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Vehicles"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "View All Customers",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/api/Admin/customers",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Admin",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Process Sale",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"saleID\": \"YOU_MUST_INSERT_SALE_ID_HERE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Sales/process-sale",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Sales",
+										"process-sale"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Sale",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"vehicleId\": \"YOU_MUST_INSERT_VEHICLEID_HERE\",\r\n  \"customerId\": \"YOU_MUST_INSERT_CUSTOMERID_HERE\",\r\n  \"price\": 25000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Sales/add-sale",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Sales",
+										"add-sale"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Step 3",
+					"item": [
+						{
+							"name": "request update otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"admin@test.com\",\r\n  \"action\": \"UpdateVehicle\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Auth/request-otp",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Auth",
+										"request-otp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate  purchase update otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"admin@test.com\",\r\n  \"action\": \"UpdateVehicle\",\r\n  \"otp\": \"YOU_MUST_ENTER_THE_OTP\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Auth/validate-otp",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Auth",
+										"validate-otp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Vehicle",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "X-OTP-Token",
+										"value": "6d1c5a8d-3fba-4aa0-8bae-7eed2beb867f",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"make\": \"string\",\r\n  \"model\": \"string\",\r\n  \"year\": 0,\r\n  \"price\": 0,\r\n  \"color\": \"string\",\r\n  \"mileage\": 0,\r\n  \"available\": true,\r\n  \"description\": \"string\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/Vehicles/PLEASE_INSERT_ID_HERE",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"Vehicles",
+										"PLEASE_INSERT_ID_HERE"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "You will need to get a car id from the database for updating a vehicle  \n  \nYou will first request a OTP, validate it, and then send it with the request."
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImQxNTExMDJjLWU2NzEtNDcxZC05MWIwLTg3M2I4M2QwNGZmMyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHRlc3QuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IkFkbWluIEFsam9oYW5pIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW4iLCJleHAiOjE3NTk5NTM5MzMsImlzcyI6IkNhckRlYWxlcnNoaXBBUEkifQ.HuRoPqOt206Nk6cWECvT6I-buJi4fDqCbveIRtbjn6Q",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

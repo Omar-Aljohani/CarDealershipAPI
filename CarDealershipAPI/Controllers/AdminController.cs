@@ -17,7 +17,7 @@ namespace CarDealershipAPI.Controllers
         [HttpGet("customers")]
         public async Task<IActionResult> GetCustomers()
         {
-            var customers = await _db.Users.Where(u => u.Role == Models.Role.Customer).Select(u => new { u.Id, u.Name, u.Email }).ToListAsync();
+            var customers = await _db.Users.Where(u => u.Role == Models.Role.Customer).Select(u => new { u.Id, u.Name, u.Email, u.Sales }).ToListAsync();
             return Ok(customers);
         }
     }

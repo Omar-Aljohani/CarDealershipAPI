@@ -3,10 +3,12 @@
     public class Sale
     {
         public Guid Id { get; set; }
+        public Guid requesterId { get; set; }
         public Guid VehicleId { get; set; }
         public Guid UserId { get; set; }
         public DateTime PurchasedAt { get; set; } = DateTime.UtcNow;
         public decimal Price { get; set; }
+        public DateTime? ProcessedAt { get; set; }
         // navigation
         public Vehicle? Vehicle { get; set; }
         // navigation

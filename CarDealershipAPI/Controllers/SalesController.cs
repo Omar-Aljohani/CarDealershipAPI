@@ -22,6 +22,15 @@ namespace CarDealershipAPI.Controllers
             _otp = otp;
         }
 
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var v = await _db.Sales.FindAsync(id);
+            if (v == null) return NotFound();
+            return Ok(v);
+        }
+
         [Authorize(Roles = "Customer")]
         [HttpPost("request-purchase")]
         public async Task<IActionResult> PurchaseRequest([FromBody] PurchaseRequestDto dto)
@@ -39,6 +48,7 @@ namespace CarDealershipAPI.Controllers
             var sale = new Sale
             {
                 Id = Guid.NewGuid(),
+                requesterId = currentUserId,
                 VehicleId = v.Id,
                 UserId = currentUserId,
                 Price = v.Price,
@@ -57,13 +67,30 @@ namespace CarDealershipAPI.Controllers
         [HttpPost("process-sale")]
         public async Task<IActionResult> ProcessSale([FromBody] ProcessSaleDto dto)
         {
+            var sale = await _db.Sales.FindAsync(dto.SaleID);
+            if (sale == null) return NotFound(new { message = "Sale not found" });
+            if (sale.ProcessedAt != null) return BadRequest(new { message = "Sale already processed" });
+
+            sale.ProcessedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+
+            return Ok(sale);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("add-sale")]
+        public async Task<IActionResult> AddSale([FromBody] AddSaleDto dto)
+        {
+            var currentUserId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
             var vehicle = await _db.Vehicles.FindAsync(dto.VehicleId);
             var customer = await _db.Users.FindAsync(dto.CustomerId);
-            if (vehicle == null || customer == null) return BadRequest(new {message = "Invalid vehicle or customer"});
+            if (vehicle == null || customer == null) return BadRequest(new { message = "Invalid vehicle or customer" });
+            if (!vehicle.Available) return BadRequest(new { message = "Vehicle is unavailable" });
 
             var sale = new Sale
             {
                 Id = Guid.NewGuid(),
+                requesterId = currentUserId,
                 VehicleId = vehicle.Id,
                 UserId = customer.Id,
                 Price = dto.Price,
@@ -75,7 +102,7 @@ namespace CarDealershipAPI.Controllers
             _db.Vehicles.Update(vehicle);
             await _db.SaveChangesAsync();
 
-            return Ok(sale);
+            return CreatedAtAction(nameof(Details), new {id = sale.Id}, sale.Id);
         }
 
         [Authorize]

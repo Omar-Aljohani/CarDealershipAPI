@@ -10,6 +10,7 @@
 ## Important Note
 There is a postman collection `CarDealershipAPI.postman_collection.json` included which contains the valid path of calls to demonstrate the API, organized in steps and providing details of the request body and headers. Use it to test the API easily.
 Additionally each step folder will contain in its description any additional requirment or changes that need to be done to the request that belongs to it. Like inserting the OTP value or adding a header. For the ease of testing I heavily recommend using this collection.
+You can either download the desktop app and import the collection - recommanded - or use the web version of Postman and view the published verison throught this link https://documenter.getpostman.com/view/34833096/2sB3QKq9Gr.
 Nevertheless, the endpoints and flows are documented below.
 
 ## Endpoints
@@ -29,9 +30,10 @@ header `X-OTP-Token` for protected actions
 ### Sales
 - `POST /api/sales/request-purchase` - Customer purchase request (JWT Customer + OTP token header)
 - `GET /api/sales/history` - view purchase history (Customer sees own history; Admin sees all)
-- `POST /api/sales/process-sale` - Admin: finalize sale
+- `POST /api/sales/process-sale` - Admin: finalize sale, this path require the sale ID to mark it as processed
+- `POST /api/sales/add-sale` - Admin: add a sale directly for a customer, can be used for walk-in customers.
 ### Admin
-- `GET /api/admin/customers` - Admin: list customers
+- `GET /api/admin/customers` - Admin: list customers, with sales.
 
 ## OTP flow (detailed)
 1. Client calls `POST /api/auth/request-otp` with `{ "email": "user@x.com",
@@ -49,7 +51,7 @@ production.
 token for subsequent action requests to avoid resending OTP on every call.
 - JWT has a moderate expiry and contains role claims for authorization checks.
 - Input validation uses DataAnnotations and controller-level checks.
-- Browse is a public accissible route, does not require authntication.
+- I did not understand what process sale means in this context, I thought it meant one of two, either marking a purchase request as completed or adding a sale directly for a customer, so I implemented both.
 
 ## Configuration
 Check `appsettings.json` for `Jwt:Key` and `Jwt:Issuer`.

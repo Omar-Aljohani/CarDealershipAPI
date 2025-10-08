@@ -12,7 +12,6 @@ namespace CarDealershipAPI.Models
         public string PasswordHash { get; set; } = string.Empty;
         public Role Role { get; set; } = Role.Customer;
         // navigation
-        [JsonIgnore]
         public List<Sale>? Sales { get; set; }
     }
 }

@@ -30,7 +30,7 @@ if(configuration["Jwt:Key"] == null || configuration["Jwt:Key"] == String.Empty)
 {
     throw new Exception("You must provide a valid JWT key in configuration");
 }
-var jwtKey = configuration["Jwt:Key"];
+var jwtKey = configuration["Jwt:Key"]!;
 var jwtIssuer = configuration["Jwt:Issuer"] ?? "CarDealershipAPI";
 
 builder.Services.AddAuthentication(options =>
